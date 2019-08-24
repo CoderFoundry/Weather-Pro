@@ -1,8 +1,6 @@
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-
-
 const iconValues = {
     CLEARDAY: 'clear-day',
     CLEARNIGHT: 'clear-night',
@@ -19,6 +17,7 @@ const iconValues = {
 // fetch the weather from the dark ski api
 function fetchWeatherReport(apiKey, latitude, longitude) {
 
+    //to avoid the cors issue you need to run through a proxy or make the call server side.
     var DsProxyLink = `https://cors-anywhere.herokuapp.com/`;
     var DsApiLink = `${DsProxyLink}https://api.darksky.net/forecast/${apiKey}/${latitude},${longitude}`;
 
@@ -62,7 +61,8 @@ function fetchWeatherReport(apiKey, latitude, longitude) {
 }
 
 function fetchLocation(apiKey, latitude, longitude) {
-    //var DsProxyLink = `https://cors-anywhere.herokuapp.com/`;
+
+    //you don't need a proxy but you need secure your key in the google developer console. 
     var googleApiLink = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
 
     fetch(googleApiLink)
@@ -71,15 +71,9 @@ function fetchLocation(apiKey, latitude, longitude) {
         })
         .then(data => {
             // Work with JSON data here
-            var resultsHTML = "";
-            var tableHTML = "";
 
-            //var windSpeed = data.currently.windSpeed
-
-            //Set values for the location
+            //Set values for the location we picked the 4 object in the results becuase show the approximate address
             document.getElementById("location").innerHTML = data.results[4].formatted_address;
-
-
         })
         .catch(err => {
             // Do something for an error here
@@ -93,12 +87,11 @@ function success(position) {
     document.getElementById('long').innerHTML = position.coords.longitude;
     document.getElementById('lat').innerHTML = position.coords.latitude;
 
-    //ADD your keys here. My keys are located in a key.js file but are not included in the sample code for security reasons
+    //ADD your keys here. My keys are located in a key.js file but are not included in the sample code for security reasons.
     //var dsKey = "";
-    //var GoogleApiKey= "";
+    //var googleApiKey= "";
 
-    fetchLocation(GoogleApiKey, position.coords.latitude, position.coords.longitude)
-
+    fetchLocation(googleApiKey, position.coords.latitude, position.coords.longitude)
     fetchWeatherReport(DsKey, position.coords.latitude, position.coords.longitude)
 }
 
@@ -206,6 +199,7 @@ function getICON(icon) {
     }
 }
 
+//try and location the user
 function initGeolocation() {
     if (navigator.geolocation) {
         // Call getCurrentPosition with success and failure callbacks
