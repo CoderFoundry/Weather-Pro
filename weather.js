@@ -1,7 +1,7 @@
-const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const wDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const wMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-const iconValues = {
+const iconValue = {
     CLEARDAY: 'clear-day',
     CLEARNIGHT: 'clear-night',
     RAIN: 'rain',
@@ -19,7 +19,7 @@ function fetchWeatherReport(apiKey, latitude, longitude) {
 
     //to avoid the cors issue you need to run through a proxy or make the call server side.
     var DsProxyLink = `https://cors-anywhere.herokuapp.com/`;
-    var DsApiLink = `${DsProxyLink}https://api.darksky.net/forecast/${apiKey}/${latitude},${longitude}`;
+    var DsApiLink = `${DsProxyLink}https://api.darksky.net/forecast/${apiKey}/${latitude},${longitude}?exclude=minutely,alerts,flags`;
 
     fetch(DsApiLink)
         .then(response => {
@@ -36,7 +36,7 @@ function fetchWeatherReport(apiKey, latitude, longitude) {
             var humidity = data.currently.humidity;
             var windSpeed = data.currently.windSpeed
             var ts = new Date(data.currently.time * 1000);
-            var forecastDate = `${days[ts.getDay()]} ${months[ts.getMonth()]} ${ts.getDate()}`
+            var forecastDate = `${wDay[ts.getDay()]} ${wMonth[ts.getMonth()]} ${ts.getDate()}`
 
 
             //Set values for the current conditions
@@ -45,7 +45,6 @@ function fetchWeatherReport(apiKey, latitude, longitude) {
             document.getElementById("summary").innerHTML = summary;
             document.getElementById("currentTemp").innerHTML = `${Math.round(temperature)}&deg`;
             document.getElementById("weatherIcon").src = getICON(icon);
-            document.getElementById('icon').innerHTML = icon;
             document.getElementById("perciptation").innerHTML = `Precipitation ${precipProbability*100}%`;
             document.getElementById("humidty").innerHTML = `Humidity ${Math.round(humidity*100)}%`;
             document.getElementById("wind").innerHTML = `Winds ${Math.round(windSpeed)} mph`;
@@ -81,25 +80,7 @@ function fetchLocation(apiKey, latitude, longitude) {
         })
 }
 
-//if naviation is available show weather for the current location
-function success(position) {
 
-    document.getElementById('long').innerHTML = position.coords.longitude;
-    document.getElementById('lat').innerHTML = position.coords.latitude;
-
-    //ADD your keys here. My keys are located in a key.js file but are not included in the sample code for security reasons.
-    //var dsKey = "";
-    //var googleApiKey= "";
-
-    fetchLocation(googleApiKey, position.coords.latitude, position.coords.longitude)
-    fetchWeatherReport(DsKey, position.coords.latitude, position.coords.longitude)
-}
-
-function fail() {
-
-    //You could default to your favorite city like Kernersville, NC the home of Coder Foundry!
-    alert("Sorry, your browser does not support geolocation services.");
-}
 
 //render the daily forecast
 function renderDailyForecast(fcData) {
@@ -151,7 +132,7 @@ function renderWeeklyForecast(fcData) {
 
         let ts = new Date(fcData.data[i].time * 1000);
 
-        let dayTime = days[ts.getDay()];
+        let dayTime = wDay[ts.getDay()];
         let summary = fcData.data[i].summary;
         let tempHigh = `${Math.round(fcData.data[i].temperatureHigh)}&deg`;
         let tempLow = `${Math.round(fcData.data[i].temperatureLow)}&deg`;
@@ -170,31 +151,30 @@ function renderRow(dayTime, summary, tempHigh, colVal4) {
 //render the correct icon
 function getICON(icon) {
     switch (icon) {
-        case iconValues.CLEARDAY:
+        case iconValue.CLEARDAY:
             return "images/SunnyDay.png";
-            break;
-        case iconValues.CLOUDY:
-        case iconValues.PARTLY_CLOUDY_DAY:
+
+        case iconValue.CLOUDY:
+        case iconValue.PARTLY_CLOUDY_DAY:
             return "images/MostlySunny.png";
-            break;
-        case iconValues.CLEARNIGHT:
+
+        case iconValue.CLEARNIGHT:
             return "images/ClearMoon.png";
-            break;
-        case iconValues.PARTLY_CLOUDY_NIGHT:
+
+        case iconValue.PARTLY_CLOUDY_NIGHT:
             return "images/CloudyMoon.png";
-            break;
-        case iconValues.RAIN:
+        case iconValue.RAIN:
             return "images/Rain.png";
-            break;
-        case iconValues.SNOW:
+
+        case iconValue.SNOW:
             return "images/SNOW.png";
-            break;
-        case iconValues.SLEET:
+
+        case iconValue.SLEET:
             return "images/Sleet.png";
-            break;
+
         default:
             return "images/SunnyDay.png";
-            break;
+
 
     }
 }
@@ -207,4 +187,20 @@ function initGeolocation() {
     } else {
         alert("Sorry, your browser does not support geolocation services.");
     }
+}
+
+//if naviation is available show weather for the current location
+function success(position) {
+
+    //ADD your keys here. My keys are located in a key.js file but are not included in the sample code for security reasons.
+    //var dsKey = "";
+    //var googleApiKey= "";
+    fetchLocation(googleApiKey, position.coords.latitude, position.coords.longitude)
+    fetchWeatherReport(dsKey, position.coords.latitude, position.coords.longitude)
+}
+
+function fail() {
+
+    //You could default to your favorite city like Kernersville, NC the home of Coder Foundry!
+    alert("Sorry, your browser does not support geolocation services.");
 }
